@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <script>
+        MathJax = {
+            loader: { load: ['[tex]/enclose'] },
+            tex2jax: {
+                packages: ['base'],        // extensions to use
+                inlineMath: [              // start/end delimiter pairs for in-line math
+                    ['\\(', '\\)']
+                ],
+                displayMath: [             // start/end delimiter pairs for display math
+                    ['$$', '$$'],
+                    ['\\[', '\\]']
+                ],
+                processEscapes: true,      // use \$ to produce a literal dollar sign
+                processEnvironments: true, // process \begin{xxx}...\end{xxx} outside math mode
+                processRefs: true,         // process \ref{...} outside of math mode
+                digits: /^(?:[0-9]+(?:\{,\}[0-9]{3})*(?:\.[0-9]*)?|\.[0-9]+)/,
+                // pattern for recognizing numbers
+                tags: 'none',              // or 'ams' or 'all'
+                tagSide: 'right',          // side for \tag macros
+                tagIndent: '0.8em',        // amount to indent tags
+                useLabelIds: true,         // use label name rather than tag for ids
+                maxMacros: 1000,           // maximum number of macro substitutions per expression
+                maxBuffer: 5 * 1024,       // maximum size for the internal TeX string (5K)
+                baseURL:                   // URL for use with links to tags (when there is a <base> tag in effect)
+                    (document.getElementsByTagName('base').length === 0) ?
+                        '' : String(document.location).replace(/#.*$/, ''),
+                formatError:               // function called when TeX syntax errors occur
+                    (jax, err) => jax.formatError(err)
+            },
+            processEscapes: true
+        };
+    </script>
+    <style>
+        :root {
+            --body-background: #f0f0f0;
+        }
+
+        body {
+            background-color: var(--body-background);
+            box-sizing: border-box;
+            margin: 0px;
+            padding: 10px;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.42857143;
+            color: #333;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin: 2rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin: 1.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            margin: 1.3rem 0;
+        }
+
+        h4 {
+            font-size: 1.2rem;
+            margin: 1.2rem 0;
+        }
+
+        h5 {
+            font-size: 1.1rem;
+            margin: 1.1rem 0;
+        }
+
+        h6 {
+            font-size: 1rem;
+            margin: 1rem 0;
+        }
+
+        ul,
+        ol,
+        li,
+        section,
+        p {
+            font-size: 1rem;
+        }
+
+        ul,
+        ol {
+            padding-left: 2rem;
+        }
+
+        main {
+            background-color: #fff;
+            box-sizing: border-box;
+            border-radius: 20px;
+            margin: 0px auto;
+            max-width: 900px;
+            padding: 10px;
+            width: 100%;
+        }
+
+        a {
+            color: #337ab7;
+            text-decoration: none;
+        }
+
+        a:focus,
+        a:hover {
+            color: #23527c;
+            text-decoration: underline;
+        }
+
+        a:focus {
+            outline: 5px auto -webkit-focus-ring-color;
+            outline-offset: -2px;
+        }
+
+        .success {
+            background-color: #dff0d8;
+            border-color: #d6e9c6;
+            color: #3c763d;
+        }
+
+        .info {
+            background-color: #d9edf7;
+            border-color: #bce8f1;
+            color: #31708f;
+        }
+
+        .warning {
+            background-color: #fcf8e3;
+            border-color: #faebcc;
+            color: #8a6d3b;
+        }
+
+        .danger {
+            background-color: #f2dede;
+            border-color: #ebccd1;
+            color: #a94442;
+        }
+
+        .success,
+        .info,
+        .warning,
+        .danger {
+            border: 1px solid transparent;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            padding: 15px;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        blockquote {
+            border-left: 0.25rem solid #ddd;
+            color: #777;
+            font-size: 1rem;
+            margin: 0px;
+            padding: 0 1rem;
+        }
+
+        table {
+            border-spacing: 0;
+            border-collapse: collapse;
+            display: block;
+            margin-top: 0;
+            margin-bottom: 16px;
+            overflow: auto;
+            width: 100%;
+            word-break: keep-all;
+        }
+
+        table tr {
+            border-top: 1px solid #ddd;
+            padding: 6px 13px;
+        }
+
+        table th {
+            border: 1px solid #ddd;
+            padding: 6px 13px;
+        }
+
+        table td {
+            border: 1px solid #ddd;
+            padding: 6px 13px;
+        }
+
+        table tr:nth-child(2n) {
+            background-color: var(--body-background);
+        }
+
+        pre {
+            /* padding: 16px; */
+            overflow: auto;
+            font-size: 85%;
+            line-height: 1.45;
+        }
+
+        code {
+            border-radius: 3px;
+            background-color: var(--body-background);
+            display: block;
+            margin: 0px;
+            padding: 16px;
+            overflow-x: auto;
+        }
+
+        code table tr:nth-child(2n) {
+            background-color: transparent;
+        }
+
+        code.language-mermaid,
+        code.language-sequence,
+        code.language-flow {
+            background-color: transparent;
+            text-align: center;
+        }
+
+        mark {
+            padding: 0.2rem;
+            background-color: #fff1a7;
+        }
+
+        /*---hljs---*/
+        .hljs-comment {
+            color: #708090;
+        }
+
+        .hljs-punctuation,
+        .hljs-tag {
+            color: #444a
+        }
+
+        .hljs-tag .hljs-attr,
+        .hljs-tag .hljs-name {
+            color: #444
+        }
+
+        .hljs-attribute,
+        .hljs-doctag,
+        .hljs-keyword,
+        .hljs-meta .hljs-keyword,
+        .hljs-name,
+        .hljs-selector-tag {
+            color: #07a;
+        }
+
+        .hljs-deletion,
+        .hljs-number,
+        .hljs-quote,
+        .hljs-selector-class,
+        .hljs-selector-id,
+        .hljs-template-tag,
+        .hljs-type {
+            color: #690
+        }
+
+        .hljs-section,
+        .hljs-title {
+            color: #dd4a68;
+        }
+
+        .hljs-link,
+        .hljs-operator,
+        .hljs-regexp,
+        .hljs-selector-attr,
+        .hljs-selector-pseudo,
+        .hljs-symbol,
+        .hljs-template-variable,
+        .hljs-variable {
+            color: #bc6060
+        }
+
+        .hljs-literal {
+            color: #78a960
+        }
+
+        .hljs-addition,
+        .hljs-built_in,
+        .hljs-bullet,
+        .hljs-code {
+            color: #397300
+        }
+
+        .hljs-meta {
+            color: #1f7199
+        }
+
+        .hljs-meta,
+        .hljs-string {
+            color: #690
+        }
+
+        .hljs-emphasis {
+            font-style: italic
+        }
+
+        .hljs-strong {
+            font-weight: 700
+        }
+
+        table.hljs-ln,
+        .hljs-ln td,
+        .hljs-ln tr {
+            /*override table style*/
+            border: 0px;
+            padding: 0px;
+            margin: 0px;
+        }
+
+        .hljs-ln-numbers {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            color: #afafaf !important;
+            border-right: 3px solid #6ce26c !important;
+        }
+
+        .hljs-ln-n {
+            box-sizing: content-box;
+            vertical-align: top;
+            padding: 0px 8px 0px 0px;
+            min-width: 20px;
+            text-align: right;
+        }
+
+        .hljs-ln-code {
+            padding: 0px 0px 0px 16px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <h1 id="hackmd-to-html-cli" tabindex="-1">hackmd-to-html-cli</h1>
+<p><a href="https://www.npmjs.org/package/hackmd-to-html-cli"><img src="https://img.shields.io/npm/v/hackmd-to-html-cli.svg?logo=npm&amp;style=flat-square" alt="NPM version"></a> <img src="https://img.shields.io/github/license/liao2000/hackmd-to-html-cli?color=yellow&amp;style=flat-square" alt=""> <img src="https://img.shields.io/github/workflow/status/liao2000/hackmd-to-html-cli/CI?style=flat-square" alt=""> <img src="https://img.shields.io/npm/dt/hackmd-to-html-cli?color=blue&amp;style=flat-square" alt=""></p>
+<p><div class="table-of-contents"><ul><li><a href="#hackmd-to-html-cli">hackmd-to-html-cli</a><ul><li><a href="#title">Title</a><ul><li><a href="#h3">h3</a><ul><li><a href="#h4">h4</a></li></ul></li></ul></li><li><a href="#blockquote">Blockquote</a></li><li><a href="#text">Text</a></li><li><a href="#list">List</a></li><li><a href="#check-box">Check box</a></li><li><a href="#table">Table</a></li><li><a href="#container">Container</a></li><li><a href="#math">Math</a></li><li><a href="#code">Code</a></li><li><a href="#mermaid">Mermaid</a><ul><li><a href="#sequence">Sequence</a></li><li><a href="#flowchart">Flowchart</a></li></ul></li><li><a href="#abbr">Abbr</a></li><li><a href="#footnote">Footnote</a></li></ul></li></ul></div></p>
+<h2 id="title" tabindex="-1">Title</h2>
+<h3 id="h3" tabindex="-1">h3</h3>
+<h4 id="h4" tabindex="-1">h4</h4>
+<h5 id="h5" tabindex="-1">h5</h5>
+<h6 id="h6" tabindex="-1">h6</h6>
+<h2 id="blockquote" tabindex="-1">Blockquote</h2>
+<blockquote>
+<p>blockquoute</p>
+<blockquote>
+<p>Hello</p>
+</blockquote>
+</blockquote>
+<h2 id="text" tabindex="-1">Text</h2>
+<p><s>del</s> <em>italic</em> <strong>bold</strong> <ins>inserted</ins> <mark>marked</mark> H<sub>2</sub>O 1<sup>st</sup> <ruby>超電磁砲<rt>Railgun</rt></ruby></p>
+<p>🉑 😄 👍 ♒</p>
+<p>See repository on github: <a href="https://github.com/liao2000/hackmd-to-html-cli/">https://github.com/liao2000/hackmd-to-html-cli/</a></p>
+<h2 id="list" tabindex="-1">List</h2>
+<ul>
+<li>Eigensystems
+<ul>
+<li>Eigenvalue</li>
+<li>Eigenvector</li>
+</ul>
+</li>
+<li>Inner-Product Vector Spaces</li>
+</ul>
+<ol>
+<li>高海千歌</li>
+<li>渡辺曜</li>
+<li>桜内梨子</li>
+</ol>
+<h2 id="check-box" tabindex="-1">Check box</h2>
+<ul>
+<li><div class="checkbox"><input type="checkbox" id="checkbox0" checked="true"><label for="checkbox0">checked</label></div></li>
+<li><div class="checkbox"><input type="checkbox" id="checkbox1"><label for="checkbox1">unchecked</label></div></li>
+</ul>
+<h2 id="table" tabindex="-1">Table</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">th</th>
+<th style="text-align:center">th</th>
+<th style="text-align:right">th</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">left</td>
+<td style="text-align:center">center</td>
+<td style="text-align:right">right</td>
+</tr>
+<tr>
+<td style="text-align:left">xxxxxx</td>
+<td style="text-align:center">xxxxxx</td>
+<td style="text-align:right">xxxxxx</td>
+</tr>
+</tbody>
+</table>
+<h2 id="container" tabindex="-1">Container</h2>
+<div class="success">
+<p>success</p>
+</div>
+<div class="info">
+<p>info</p>
+</div>
+<div class="warning">
+<p>warning</p>
+</div>
+<div class="danger">
+<p>danger</p>
+</div>
+<h2 id="math" tabindex="-1">Math</h2>
+<p>A matrix \(A\) is diagonalizable if there is a diagonal matrix \(D\) and an invertible matrix \(P\) s.t.<br>
+\[P^{-1}AP=D\]</p>
+<p>For example:</p>
+<p>\[
+\begin{bmatrix}2&amp;-1\\-1&amp;1\end{bmatrix}\begin{bmatrix}6&amp;-1\\2&amp;3\end{bmatrix}\begin{bmatrix}1&amp;1\\1&amp;2\end{bmatrix}=\begin{bmatrix}5&amp;0\\0&amp;4\end{bmatrix}
+\]</p>
+<h2 id="code" tabindex="-1">Code</h2>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+int main(){
+    printf(&quot;hello\n&quot;);
+    return 0;
+}
+</code></pre>
+<pre><code class="language-go=">package main
+
+import (
+	&quot;io&quot;
+	&quot;log&quot;
+	&quot;net/http&quot;
+)
+
+func main() {
+	http.HandleFunc(&quot;/&quot;, func(w http.ResponseWriter, req *http.Request) {
+		io.WriteString(w, &quot;Hello, TLS!\n&quot;)
+	})
+
+	// One can use generate_cert.go in crypto/tls to generate cert.pem and key.pem.
+	log.Printf(&quot;About to listen on 8443. Go to https://127.0.0.1:8443/&quot;)
+	err := http.ListenAndServeTLS(&quot;:8443&quot;, &quot;cert.pem&quot;, &quot;key.pem&quot;, nil)
+	log.Fatal(err)
+}
+</code></pre>
+<pre><code>plaintext
+</code></pre>
+<h2 id="mermaid" tabindex="-1">Mermaid</h2>
+<pre><code class="language-mermaid">pie showData
+    title Key elements in Product X
+    &quot;Calcium&quot; : 42.96
+    &quot;Potassium&quot; : 50.05
+    &quot;Magnesium&quot; : 10.01
+    &quot;Iron&quot; :  5
+</code></pre>
+<h3 id="sequence" tabindex="-1">Sequence</h3>
+<pre><code class="language-sequence">Alice-&gt;Bob: Hello Bob, how are you?
+Note right of Bob: Bob thinks
+Bob--&gt;Alice: I am good thanks!
+</code></pre>
+<h3 id="flowchart" tabindex="-1">Flowchart</h3>
+<pre><code class="language-flow">st=&gt;start: Start:&gt;http://www.google.com[blank]
+e=&gt;end:&gt;http://www.google.com
+op1=&gt;operation: My Operation
+sub1=&gt;subroutine: My Subroutine
+cond=&gt;condition: Yes
+or No?:&gt;http://www.google.com
+io=&gt;inputoutput: catch something...
+para=&gt;parallel: parallel tasks
+
+st-&gt;op1-&gt;cond
+cond(yes)-&gt;io-&gt;e
+cond(no)-&gt;para
+para(path1, bottom)-&gt;sub1(right)-&gt;op1
+para(path2, top)-&gt;op1
+</code></pre>
+<h2 id="abbr" tabindex="-1">Abbr</h2>
+<p>The <abbr title="Hyper Text Markup Language">HTML</abbr> specification is maintained by the <abbr title="World Wide Web Consortium">W3C</abbr>.</p>
+<h2 id="footnote" tabindex="-1">Footnote</h2>
+<p>Here is a footnote reference,<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> and another.<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></p>
+<hr class="footnotes-sep">
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p>Here is the footnote. <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn2" class="footnote-item"><p>Here’s one with multiple blocks.<br>
+Subsequent paragraphs are indented to show that they<br>
+belong to the previous footnote. <a href="#fnref2" class="footnote-backref">↩︎</a></p>
+</li>
+</ol>
+</section>
+
+    </main>
+    <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/highlightjs-line-numbers.js@2.6.0/dist/highlightjs-line-numbers.min.js"></script>
+    <!--mermaid-->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <!--sequence-->
+    <script src="https://bramp.github.io/js-sequence-diagrams/js/webfont.js"></script>
+    <script src="https://bramp.github.io/js-sequence-diagrams/js/snap.svg-min.js"></script>
+    <script src="https://bramp.github.io/js-sequence-diagrams/js/underscore-min.js"></script>
+    <script src="https://bramp.github.io/js-sequence-diagrams/js/sequence-diagram-min.js"></script>
+    <!--flowchart-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.3.0/raphael.min.js"></script>
+    <script src="https://flowchart.js.org/flowchart-latest.js"></script>
+    <script>
+        mermaid.init({ noteMargin: 10 }, document.querySelectorAll(".language-mermaid"));
+        mermaid.initialize({ startOnLoad: true });
+        document.querySelectorAll(".language-sequence")?.forEach((dom, i) => {
+            dom.id = `sequence-${i}`;
+            let content = dom.textContent;
+            dom.textContent = "";
+            Diagram.parse(content).drawSVG(dom.id, { theme: 'simple' });
+        });
+        document.querySelectorAll(".language-flow")?.forEach((dom, i) => {
+            dom.id = `flow-${i}`;
+            let content = dom.textContent;
+            dom.textContent = "";
+            flowchart.parse(content).drawSVG(dom.id);
+        });
+        // https://github.com/highlightjs/highlight.js/blob/main/SUPPORTED_LANGUAGES.md
+        document.querySelectorAll('code')?.forEach((dom) => {
+            let lang = dom.className.match(/language\-([^=]*)?(=?)$/);
+            if (lang && lang[1]) {
+                hljs.highlightElement(dom);
+            }
+            if (lang && lang[2]) {
+                hljs.lineNumbersBlock(dom);
+            }
+        });
+    </script>
+</body>
+
+</html>
